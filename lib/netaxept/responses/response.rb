@@ -3,16 +3,20 @@ module Netaxept
     
     class Response
       
-      #attr_reader :errors
+      attr_reader :errors
       
       def initialize(node)
-        # super()
-        # @errors = []
-        # if(node.xpath("//Exception").first)
-        #   errors << Netaxept::ErrorMessage.new(node.xpath("//Error"))
-        # elsif(node.xpath("//BBSException").first)
-        #   errors << Netaxept::ErrorMessage.new(node)
-        # end
+        super()
+        @errors = []
+        if(node["Exception"])
+          errors << Netaxept::ErrorMessage.new(node["Exception"]["Error"])
+        elsif(node["BBSException"])
+          errors << Netaxept::ErrorMessage.new(node)
+        end
+      end
+      
+      def success?
+        self.errors.empty?
       end
       
     end

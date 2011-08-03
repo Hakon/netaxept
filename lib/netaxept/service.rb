@@ -4,6 +4,8 @@ module Netaxept
   class Service
     include HTTParty
     
+    default_params :CurrencyCode => "NOK"
+    
     module Configuration
       
       ##
@@ -44,8 +46,23 @@ module Netaxept
         :orderNumber => order_id
         }.merge(options)
         
-      Responses::RegisterResponse.new(self.class.get("/Netaxept/Register.aspx", params))
+      Responses::RegisterResponse.new(self.class.get("/Netaxept/Register.aspx", params).parsed_response)
       
+    end
+    
+    ##
+    # Captures the whole amount instantly
+    
+    def sale(transaction_id, amount)
+      params = {
+        :query => {
+          :amount => amount,
+          :transactionId => transaction_id,
+          :operation => "SALE"
+        }
+      }
+      
+      Responses::SaleResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
     end
     
   end

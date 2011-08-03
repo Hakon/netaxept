@@ -30,22 +30,55 @@ describe Netaxept::Service do
   end
   
   describe ".register" do
+    use_vcr_cassette
     
-    it "calls the Register.aspx with the first argument as amount, the second as order id amd the third as custom params" do
+    describe "a valid request" do
       
-      Netaxept::Service.should_receive(:get).with("/Netaxept/Register.aspx", :query => {
-        :amount => 20100,
-        :orderNumber => 12,
-        :redirectUrl => "http://localhost:3000/order/1/return"
-      })
+      let(:response) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return") }
       
-      service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return")
+      it "is successful" do
+        response.success?.should == true
+      end
+      
+      it "has a transaction_id" do
+        response.transaction_id.should_not be_nil
+      end
       
     end
     
-    it "returns an instance of Netaxept::Responses::RegisterResponse" do
-      response = service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return")
-      response.should be_a Netaxept::Responses::RegisterResponse
+    describe "a request without error (no money)" do
+
+      let(:response) { service.register(0, 12, :redirectUrl => "http://localhost:3000/order/1/return") }
+
+      it "is not a success" do
+        response.success?.should == false
+      end
+      
+      it "does not have a transaction id" do
+        response.transaction_id.should be_nil
+      end
+      
+      it "has an error message" do
+        response.errors.first.message.should == "Transaction amount must be greater than zero."
+      end
+      
+    end
+    
+  end
+  
+  describe ".sale" do
+    use_vcr_cassette
+    
+    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
+    
+    describe "a valid request" do
+      
+      let(:response) { service.sale(transaction_id, 20100) }
+      
+      it "is a success" do
+        response.success?.should == true
+      end
+      
     end
     
   end
