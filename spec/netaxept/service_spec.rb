@@ -44,6 +44,15 @@ describe Netaxept::Service do
         response.transaction_id.should_not be_nil
       end
       
+      it "has a terminal url" do
+        response.terminal_url.should match /^https:\/\/epayment-test\.bbs\.no\/terminal\/default\.aspx\?MerchantID=(.*)&TransactionID=(.*)$/
+      end
+      
+      it "has a production terminal url if the environment is production" do
+        Netaxept::Service.environment = :production
+        response.terminal_url.should match /^https:\/\/epayment\.bbs\.no\/terminal\/default\.aspx\?MerchantID=(.*)&TransactionID=(.*)$/
+        Netaxept::Service.environment = :test
+      end
     end
     
     describe "a request without error (no money)" do

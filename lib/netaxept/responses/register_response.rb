@@ -12,6 +12,10 @@ module Netaxept
         end
       end
       
+      def terminal_url
+        "#{Netaxept::Service.base_uri}/terminal/default.aspx?MerchantID=#{Netaxept::Service.merchant_id}&TransactionID=#{self.transaction_id}"
+      end
+      
     end # RegisterResponse
     
   end # Responses

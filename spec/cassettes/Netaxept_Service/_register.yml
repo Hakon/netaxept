@@ -49,10 +49,68 @@
       x-powered-by:
       - ASP.NET
       date:
-      - Wed, 03 Aug 2011 12:59:50 GMT
+      - Wed, 03 Aug 2011 15:44:01 GMT
       content-length:
       - '271'
     body: ! "<?xml version=\"1.0\"?>\r\n<Exception xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
       xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Error xsi:type=\"ValidationException\">\r\n
       \   <Message>Transaction amount must be greater than zero.</Message>\r\n  </Error>\r\n</Exception>"
+    http_version: '1.1'
+- !ruby/struct:VCR::HTTPInteraction
+  request: !ruby/struct:VCR::Request
+    method: :get
+    uri: https://epayment.bbs.no:443/Netaxept/Register.aspx?CurrencyCode=NOK&MerchantId=123123&token=123test&amount=20100&orderNumber=12&redirectUrl=http%3A%2F%2Flocalhost%3A3000%2Forder%2F1%2Freturn
+    body: !!null 
+    headers: !!null 
+  response: !ruby/struct:VCR::Response
+    status: !ruby/struct:VCR::ResponseStatus
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - private
+      content-type:
+      - text/xml
+      server:
+      - Microsoft-IIS/7.5
+      x-aspnet-version:
+      - 2.0.50727
+      x-powered-by:
+      - ASP.NET
+      date:
+      - Wed, 03 Aug 2011 16:22:10 GMT
+      content-length:
+      - '258'
+    body: ! "<?xml version=\"1.0\"?>\r\n<Exception xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+      xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Error xsi:type=\"AuthenticationException\">\r\n
+      \   <Message>Authentication failed (PROD)</Message>\r\n  </Error>\r\n</Exception>"
+    http_version: '1.1'
+- !ruby/struct:VCR::HTTPInteraction
+  request: !ruby/struct:VCR::Request
+    method: :get
+    uri: https://epayment.bbs.no:443/Netaxept/Register.aspx?CurrencyCode=NOK&MerchantId=123123&token=123test&amount=0&orderNumber=12&redirectUrl=http%3A%2F%2Flocalhost%3A3000%2Forder%2F1%2Freturn
+    body: !!null 
+    headers: !!null 
+  response: !ruby/struct:VCR::Response
+    status: !ruby/struct:VCR::ResponseStatus
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - private
+      content-type:
+      - text/xml
+      server:
+      - Microsoft-IIS/7.5
+      x-aspnet-version:
+      - 2.0.50727
+      x-powered-by:
+      - ASP.NET
+      date:
+      - Wed, 03 Aug 2011 16:22:10 GMT
+      content-length:
+      - '258'
+    body: ! "<?xml version=\"1.0\"?>\r\n<Exception xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+      xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Error xsi:type=\"AuthenticationException\">\r\n
+      \   <Message>Authentication failed (PROD)</Message>\r\n  </Error>\r\n</Exception>"
     http_version: '1.1'

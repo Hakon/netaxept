@@ -8,10 +8,13 @@ module Netaxept
     
     module Configuration
       
+      attr_accessor :merchant_id
+      
       ##
       # Stores the merchant id and the token for later requests
 
       def authenticate(merchant_id, token)
+        self.merchant_id = merchant_id
         default_params({
           :MerchantId => merchant_id,
           :token => token
