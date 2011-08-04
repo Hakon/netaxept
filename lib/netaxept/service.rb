@@ -68,5 +68,12 @@ module Netaxept
       Responses::SaleResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
     end
     
+    ##
+    # The terminal url for a given transaction id
+    
+    def self.terminal_url(transaction_id)
+      "#{Netaxept::Service.base_uri}/terminal/default.aspx?MerchantID=#{Netaxept::Service.merchant_id}&TransactionID=#{transaction_id}"
+    end
+    
   end
 end

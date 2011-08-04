@@ -29,6 +29,22 @@ describe Netaxept::Service do
     end
   end
   
+  describe ".terminal_url" do
+    
+    it "returns the terminal url if you pass a transaction id" do
+      Netaxept::Service.should_receive(:merchant_id).and_return("123133")
+      Netaxept::Service.terminal_url("deadbeef00").should == "https://epayment-test.bbs.no/terminal/default.aspx?MerchantID=123133&TransactionID=deadbeef00"
+    end
+    
+    it "has a production terminal url if the environment is production" do
+      Netaxept::Service.environment = :production
+        Netaxept::Service.should_receive(:merchant_id).and_return("123133")
+        Netaxept::Service.terminal_url("deadbeef00").should == "https://epayment.bbs.no/terminal/default.aspx?MerchantID=123133&TransactionID=deadbeef00"
+      Netaxept::Service.environment = :test
+    end
+    
+  end
+  
   describe ".register" do
     use_vcr_cassette
     
@@ -44,15 +60,6 @@ describe Netaxept::Service do
         response.transaction_id.should_not be_nil
       end
       
-      it "has a terminal url" do
-        response.terminal_url.should match /^https:\/\/epayment-test\.bbs\.no\/terminal\/default\.aspx\?MerchantID=(.*)&TransactionID=(.*)$/
-      end
-      
-      it "has a production terminal url if the environment is production" do
-        Netaxept::Service.environment = :production
-        response.terminal_url.should match /^https:\/\/epayment\.bbs\.no\/terminal\/default\.aspx\?MerchantID=(.*)&TransactionID=(.*)$/
-        Netaxept::Service.environment = :test
-      end
     end
     
     describe "a request without error (no money)" do
