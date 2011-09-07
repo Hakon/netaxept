@@ -5,8 +5,8 @@ require "netaxept/version"
 Gem::Specification.new do |s|
   s.name        = "netaxept"
   s.version     = Netaxept::VERSION
-  s.authors     = ["Håkon Lerring"]
-  s.email       = ["hakon@powow.no"]
+  s.authors     = ["Håkon Lerring", "Theodor Tonum"]
+  s.email       = ["hakon@powow.no", "theodor@tonum.no"]
   s.homepage    = ""
   s.summary     = %q{A gem for speaking to Nets Netaxept credit card payment service}
   s.description = %q{This gem simplifies the comunication with the netaxept service significantly. Right now it only supports register and sale, more is to come.}
