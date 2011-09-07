@@ -84,6 +84,21 @@ module Netaxept
     end
     
     ##
+    # Captures the whole amount on the credit card
+    
+    def capture(transaction_id, amount)
+      params = {
+        :query => {
+          :amount => amount,
+          :transactionId => transaction_id,
+          :operation => "CAPTURE",
+        }
+      }
+      
+      Responses::CaptureResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
+    end
+    
+    ##
     # The terminal url for a given transaction id
     
     def self.terminal_url(transaction_id)

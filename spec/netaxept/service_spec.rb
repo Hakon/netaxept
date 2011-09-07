@@ -115,4 +115,20 @@ describe Netaxept::Service do
     end
   end
   
+  describe ".capture" do
+    use_vcr_cassette
+    
+    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
+    
+    describe "a valid request" do
+      
+      let(:response) { service.capture(transaction_id, 20100) }
+      
+      it "is a success" do
+        response.success?.should == true
+      end
+      
+    end
+  end
+  
 end

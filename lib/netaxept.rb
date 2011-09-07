@@ -16,6 +16,7 @@ module Netaxept
     autoload :RegisterResponse, "netaxept/responses/register_response"
     autoload :SaleResponse, "netaxept/responses/sale_response"
     autoload :AuthResponse, "netaxept/responses/auth_response"
+    autoload :CaptureResponse, "netaxept/responses/capture_response"
     
   end
 end
