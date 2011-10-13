@@ -2,7 +2,6 @@ module Netaxept
   class ErrorMessage
     attr_accessor :message, :code, :source, :text
     def initialize(node)
-      super
       if(node)
         @message = node["Message"]
         @code = node["Code"]
