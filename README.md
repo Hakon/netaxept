@@ -10,14 +10,6 @@ or include in your _Gemfile_:
 
     gem 'netaxept'
 
-Testing
--------
-
-To run the tests:
-
-    $ bundle
-    $ rake
-
 Usage
 -----
 
@@ -63,3 +55,11 @@ After the user has authorized the payment on the Netaxept site he is redirected 
 The response is a `Responses::SaleResponse` which only has the `success?` and `errors` methods mentioned under _General_.
 
 Congratulations, you have processed a payment.
+
+Testing
+-------
+
+To run the tests:
+
+    $ bundle
+    $ rake
