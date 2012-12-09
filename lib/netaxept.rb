@@ -19,5 +19,6 @@ module Netaxept
     autoload :CaptureResponse, "netaxept/responses/capture_response"
     
     autoload :CreditResponse, "netaxept/responses/credit_response"
+    autoload :AnnulResponse, "netaxept/responses/annul_response"
   end
 end
