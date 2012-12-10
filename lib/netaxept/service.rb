@@ -113,6 +113,17 @@ module Netaxept
       Responses::CreditResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
     end
 
+    def annul(transaction_id)
+      params = {
+        :query => {
+          :transactionId => transaction_id,
+          :operation => "ANNUL"
+        }
+      }
+
+      Responses::AnnulResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
+    end
+
     ##
     # The terminal url for a given transaction id
     

@@ -150,4 +150,21 @@ describe Netaxept::Service do
 
   end
 
+  describe ".annul" do
+    use_vcr_cassette
+
+    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
+
+    describe "a valid request" do
+
+      before(:each) do
+        service.auth(transaction_id, 20100)
+      end
+
+      it "is a success" do
+        service.annul(transaction_id).success?.should == true
+      end
+    end
+
+  end
 end
