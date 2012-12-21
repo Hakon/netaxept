@@ -62,4 +62,4 @@ Testing
 To run the tests:
 
     $ bundle
-    $ rake
+    $ rake MERCHANT_ID=<your merchant id> NETAXEPT_TOKEN=<your token>

@@ -7,25 +7,25 @@ describe Netaxept::Service do
   describe ".authenticate" do
     it "sets merchant id and token as default params" do
       Netaxept::Service.should_receive(:default_params).with({
-        :MerchantId => "12341234",
-        :token => "abc123"
+        :MerchantId => NETAXEPT_TEST_MERCHANT_ID,
+        :token => NETAXEPT_TEST_TOKEN
       })
       
-      Netaxept::Service.authenticate("12341234", "abc123")
+      Netaxept::Service.authenticate(NETAXEPT_TEST_MERCHANT_ID, NETAXEPT_TEST_TOKEN)
     end
   end
   
   describe ".environment" do
-    it "sets the base_uri to https://epayment-test.bbs.no/ when set to test" do
-      Netaxept::Service.should_receive(:base_uri).with "https://epayment-test.bbs.no/"
-      
-      Netaxept::Service.environment = :test
-    end
-    
     it "sets the base_uri to https://epayment.bbs.no/ when set to production" do
       Netaxept::Service.should_receive(:base_uri).with "https://epayment.bbs.no/"
       
       Netaxept::Service.environment = :production
+    end
+    
+    it "sets the base_uri to https://epayment-test.bbs.no/ when set to test" do
+      Netaxept::Service.should_receive(:base_uri).with "https://epayment-test.bbs.no/"
+      
+      Netaxept::Service.environment = :test
     end
   end
   
@@ -46,14 +46,13 @@ describe Netaxept::Service do
   end
   
   describe ".register" do
-    use_vcr_cassette
     
     describe "a valid request" do
       
       let(:response) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return") }
       
       it "is successful" do
-        response.success?.should == true
+        response.should be_successful
       end
       
       it "has a transaction_id" do
@@ -67,104 +66,88 @@ describe Netaxept::Service do
       let(:response) { service.register(0, 12, :redirectUrl => "http://localhost:3000/order/1/return") }
 
       it "is not a success" do
-        response.success?.should == false
+        response.should fail.with_message("Transaction amount must be greater than zero.")
       end
       
       it "does not have a transaction id" do
         response.transaction_id.should be_nil
       end
       
-      it "has an error message" do
-        response.errors.first.message.should == "Transaction amount must be greater than zero."
-      end
-      
     end
     
   end
   
-  describe ".sale" do
-    use_vcr_cassette
+  context "with a transaction id" do
     
-    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
-    
-    describe "a valid request" do
-      
-      let(:response) { service.sale(transaction_id, 20100) }
-      
-      it "is a success" do
-        response.success?.should == true
-      end
-      
-    end
-    
-  end
-  
-  describe ".auth" do
-    use_vcr_cassette
-    
-    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
-    
-    describe "a valid request" do
-      
-      let(:response) { service.auth(transaction_id, 20100) }
-      
-      it "is a success" do
-        response.success?.should == true
-      end
-      
-    end
-  end
-  
-  describe ".capture" do
-    use_vcr_cassette
-    
-    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
-    
-    describe "a valid request" do
-      
-      let(:response) { service.capture(transaction_id, 20100) }
-      
-      it "is a success" do
-        response.success?.should == true
-      end
-      
-    end
-  end
-  
-  describe ".credit" do
-    use_vcr_cassette
-
     let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
 
-    describe "a valid request" do
+    before do 
 
-      before(:each) do
+      # Register some card data with the transaction.
+      url = Netaxept::Service.terminal_url(transaction_id)
+      mechanic = Mechanize.new
+      mechanic.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      mechanic.get(url) do |page|
+        form = page.form_with(:name => "form1")
+        cc_form = form.click_button(form.button_with(:value => /^Neste/)).form_with(:name => "form1") do |form|
+          
+          form["ctl10$cardNo"] = "4925000000000004"
+          form.field_with(:id => "month").options.last.tick
+          form.field_with(:id => "year").options.last.tick
+          form["ctl10$securityCode"] = "111"
+
+        end
+        mechanic.redirect_ok = false
+        cc_form.click_button(cc_form.button_with(:id => "okButton"))
+      end
+
+    end
+    
+    describe "a valid sale request" do
+
+      it "is a success" do
+        response = service.sale(transaction_id, 20100)
+        response.should be_successful
+      end
+      
+    end
+
+    describe "a valid auth request" do
+      
+      it "is a success" do
+        response = service.auth(transaction_id, 20100)
+        response.should be_successful
+      end
+      
+    end
+  
+    describe "a valid capture request" do
+      
+      it "is a success" do
         service.auth(transaction_id, 20100)
-        service.capture(transaction_id, 20100)
+        response = service.capture(transaction_id, 20100)
+        response.should be_successful
       end
+      
+    end
+  
+    describe "a valid credit request" do
 
       it "is a success" do
-        service.credit(transaction_id, 20100).success?.should == true
+        service.sale(transaction_id, 20100)
+
+        service.credit(transaction_id, 20100).should be_successful
       end
     end
 
-  end
+    describe "a valid annul request" do
 
-  describe ".annul" do
-    use_vcr_cassette
-
-    let(:transaction_id) { service.register(20100, 12, :redirectUrl => "http://localhost:3000/order/1/return").transaction_id }
-
-    describe "a valid request" do
-
-      before(:each) do
+      it "is a success" do
         service.auth(transaction_id, 20100)
-      end
-
-      it "is a success" do
-        service.annul(transaction_id).success?.should == true
+        service.annul(transaction_id).should be_successful
       end
     end
 
+    
   end
 end
