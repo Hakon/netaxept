@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Netaxept::VERSION
   s.authors     = ["Håkon Lerring", "Theodor Tonum"]
   s.email       = ["hakon@powow.no", "theodor@tonum.no"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/Hakon/netaxept"
   s.summary     = %q{A gem for speaking to Nets Netaxept credit card payment service}
   s.description = %q{This gem simplifies the comunication with the netaxept service significantly. Right now it only supports register and sale, more is to come.}
   s.has_rdoc    = true
