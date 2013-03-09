@@ -1,135 +1,48 @@
-require "httparty"
+require "rest_client"
+require "nokogiri"
 
 module Netaxept
+  UnknownEnvironmentError = Class.new(StandardError)
+  ValidationException = Class.new(StandardError)
+  AuthenticationException = Class.new(StandardError)
+
+  RegisterResponse = Struct.new(:transaction_id)
+
   class Service
-    include HTTParty
-    
-    default_params :CurrencyCode => "NOK"
-    
-    module Configuration
-      
-      attr_accessor :merchant_id
-      
-      ##
-      # Stores the merchant id and the token for later requests
 
-      def authenticate(merchant_id, token)
-        self.merchant_id = merchant_id
-        default_params({
-          :MerchantId => merchant_id,
-          :token => token
-          })
+    ENDPOINTS = {
+      test: "https://epayment-test.bbs.no",
+      production: "https://epayment.bbs.no"
+    }
+
+    def initialize(merchant_id, token, environment)
+      @base_url = ENDPOINTS[environment] or raise UnknownEnvironmentError
+      @environment = environment
+      @credentials = {
+        merchantId: merchant_id,
+        token: token
+      }
+    end
+
+    def register(params)
+      http_response = RestClient.get("#{base_url}/Netaxept/Register.aspx", params: params.merge(credentials))
+
+      xml_response = Nokogiri::XML(http_response.to_s)
+      xml_response.xpath('/Exception/Error[@xsi:type="AuthenticationException"]').each do |exception|
+        raise AuthenticationException, exception.xpath("Message/text()")
       end
-      
-      ##
-      # Switches between sandbox and production environment
-      
-      def environment=(new_environment)
-        if(new_environment == :production)
-          base_uri "https://epayment.bbs.no/"
-        end
-        if(new_environment == :test)
-          base_uri "https://epayment-test.bbs.no/"
-        end
+      xml_response.xpath('/Exception/Error[@xsi:type="ValidationException"]').each do |exception|
+        raise ValidationException, exception.xpath("Message/text()")
       end
-      
-    end
-    extend Configuration
-    
-    environment = :production
-    
-    ##
-    # Registers the order parameters with netaxept. Returns a Responses::RegisterResponse
-    
-    def register(amount, order_id, options = {})
-      
-      params = {}
-      params[:query] = {
-        :amount => amount,
-        :orderNumber => order_id
-        }.merge(options)
-        
-      Responses::RegisterResponse.new(self.class.get("/Netaxept/Register.aspx", params).parsed_response)
-      
-    end
-    
-    ##
-    # Captures the whole amount instantly
-    
-    def sale(transaction_id, amount)
-      params = {
-        :query => {
-          :amount => amount,
-          :transactionId => transaction_id,
-          :operation => "SALE"
-        }
-      }
-      
-      Responses::SaleResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
-    end
-    
-    ##
-    # Authorize the whole amount on the credit card
-    
-    def auth(transaction_id, amount)
-      params = {
-        :query => {
-          :amount => amount,
-          :transactionId => transaction_id,
-          :operation => "AUTH"
-        }
-      }
-      
-      Responses::AuthResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
-    end
-    
-    ##
-    # Captures the whole amount on the credit card
-    
-    def capture(transaction_id, amount)
-      params = {
-        :query => {
-          :amount => amount,
-          :transactionId => transaction_id,
-          :operation => "CAPTURE",
-        }
-      }
-      
-      Responses::CaptureResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
-    end
-    
-    ##
-    # Credits an amount of an already captured order to the credit card
 
-    def credit(transaction_id, amount)
-      params = {
-        :query => {
-          :amount => amount,
-          :transactionId => transaction_id,
-          :operation => "CREDIT"
-        }
-      }
+      transaction_id = xml_response.xpath("/RegisterResponse/TransactionId/text()")
+      RegisterResponse.new(transaction_id)
 
-      Responses::CreditResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
     end
 
-    def annul(transaction_id)
-      params = {
-        :query => {
-          :transactionId => transaction_id,
-          :operation => "ANNUL"
-        }
-      }
+    private
 
-      Responses::AnnulResponse.new(self.class.get("/Netaxept/Process.aspx", params).parsed_response)
-    end
+    attr_reader :environment, :base_url, :credentials
 
-    ##
-    # The terminal url for a given transaction id
-    
-    def self.terminal_url(transaction_id)
-      "#{self.base_uri}/terminal/default.aspx?MerchantID=#{self.merchant_id}&TransactionID=#{transaction_id}"
-    end
-    
   end
 end
