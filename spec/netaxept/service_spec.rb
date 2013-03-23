@@ -110,6 +110,50 @@ module Netaxept
 
 
     end
-  end
 
+    describe "performing an auth on a registered transaction" do
+
+      context "with a card with insufficient funds" do
+
+        it "raises an exception" do
+          response = subject.register({
+              amount: 100,
+              orderNumber: "100",
+              currencyCode: "NOK",
+              redirectUrl: "http://localhost:3000",
+
+              serviceType: "C", # We're going to register the card at once
+              pan: "4925000000000087",
+              expiryDate: Time.now.strftime("%m%y"),
+              securityCode: "111"
+            })
+
+          expect { subject.auth(response.transaction_id, 100) }.to raise_exception(BBSException)
+        end
+
+      end
+
+      context "with a valid card supplied to the terminal" do
+        
+        it "returns true on a successful auth" do
+          response = subject.register({
+              amount: 100,
+              orderNumber: "100",
+              currencyCode: "NOK",
+              redirectUrl: "http://localhost:3000",
+
+              serviceType: "C", # We're going to register the card at once
+              pan: "4925000000000004",
+              expiryDate: Time.now.strftime("%m%y"),
+              securityCode: "111"
+            })
+          @transaction_id = response.transaction_id
+          expect(subject.auth(@transaction_id, 100)).to equal(true)
+        end
+
+      end
+
+    end
+
+  end
 end

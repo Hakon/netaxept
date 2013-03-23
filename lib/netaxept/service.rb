@@ -57,11 +57,17 @@ module Netaxept
     end
 
     def sale(transaction_id, amount)
-      params = {
-        operation: "SALE",
-        amount: amount,
-        transactionId: transaction_id
-      }
+      process(transactionId: transaction_id, amount: amount, operation: "SALE")
+    end
+
+    def auth(transaction_id, amount)
+      process(transactionId: transaction_id, amount: amount, operation: "AUTH")
+    end
+
+    private
+
+    def process(params)
+
       http_response = RestClient.get("#{base_url}/Netaxept/Process.aspx", params: params.merge(credentials))
       xml_response = Nokogiri::XML(http_response.to_s)
       xml_response.xpath('/Exception/Error').each do |exception|
@@ -71,8 +77,6 @@ module Netaxept
       true
 
     end
-
-    private
 
     attr_reader :environment, :base_url, :credentials
 
