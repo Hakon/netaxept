@@ -5,14 +5,33 @@ module Netaxept
   UnknownEnvironmentError = Class.new(StandardError)
   ValidationException = Class.new(StandardError)
   AuthenticationException = Class.new(StandardError)
+  BBSException = Class.new(StandardError)
+  MerchantTranslationException = Class.new(StandardError)
+  UniqueTransactionIdException = Class.new(StandardError)
+  SecurityException = Class.new(StandardError)
+  QueryException = Class.new(StandardError)
+  GenericError = Class.new(StandardError)
+  NotSupportedException = Class.new(StandardError)
 
-  RegisterResponse = Struct.new(:transaction_id)
+  RegisterResponse = Struct.new(:transaction_id, :terminal_url)
 
   class Service
 
     ENDPOINTS = {
       test: "https://epayment-test.bbs.no",
       production: "https://epayment.bbs.no"
+    }
+
+    EXCEPTIONS = {
+      "AuthenticationException" => AuthenticationException,
+      "BBSException" => BBSException,
+      "MerchantTranslationException" => MerchantTranslationException,
+      "UniqueTransactionIdException" => UniqueTransactionIdException,
+      "GenericError" => GenericError,
+      "ValidationException" => ValidationException,
+      "SecurityException" => SecurityException,
+      "QueryException" => QueryException,
+      "NotSupportedException" => NotSupportedException
     }
 
     def initialize(merchant_id, token, environment)
@@ -28,15 +47,28 @@ module Netaxept
       http_response = RestClient.get("#{base_url}/Netaxept/Register.aspx", params: params.merge(credentials))
 
       xml_response = Nokogiri::XML(http_response.to_s)
-      xml_response.xpath('/Exception/Error[@xsi:type="AuthenticationException"]').each do |exception|
-        raise AuthenticationException, exception.xpath("Message/text()")
-      end
-      xml_response.xpath('/Exception/Error[@xsi:type="ValidationException"]').each do |exception|
-        raise ValidationException, exception.xpath("Message/text()")
+      xml_response.xpath('/Exception/Error').each do |exception|
+        raise EXCEPTIONS[exception.xpath("@xsi:type").to_s], exception.xpath("Message").text
       end
 
-      transaction_id = xml_response.xpath("/RegisterResponse/TransactionId/text()")
-      RegisterResponse.new(transaction_id)
+      transaction_id = xml_response.xpath("/RegisterResponse/TransactionId").text
+      RegisterResponse.new(transaction_id, base_url + "/Terminal/default.aspx?merchant_id=#{credentials[:merchantId]}&transactionId=#{transaction_id}")
+
+    end
+
+    def sale(transaction_id, amount)
+      params = {
+        operation: "SALE",
+        amount: amount,
+        transactionId: transaction_id
+      }
+      http_response = RestClient.get("#{base_url}/Netaxept/Process.aspx", params: params.merge(credentials))
+      xml_response = Nokogiri::XML(http_response.to_s)
+      xml_response.xpath('/Exception/Error').each do |exception|
+        raise EXCEPTIONS[exception.xpath("@xsi:type").to_s], exception.xpath("Message").text
+      end
+
+      true
 
     end
 
