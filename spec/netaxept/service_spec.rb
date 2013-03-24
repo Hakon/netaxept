@@ -107,17 +107,17 @@ module Netaxept
         expect { subject.sale("BLA BLA BLA", 100) }.to raise_exception(GenericError)
       end
 
-      it "returns true on a successful sale" do
-        expect(subject.sale(@transaction_id, 100)).to equal(true)
+      it "returns on a successful sale" do
+        expect { subject.sale(@transaction_id, 100) }.to_not raise_exception
       end
 
-      it "returns true on a successful auth" do
-        expect(subject.auth(@transaction_id)).to equal(true)
+      it "returns on a successful auth" do
+        expect { subject.auth(@transaction_id) }.to_not raise_exception
       end
 
-      it "returns true on a capture with correct amount" do
+      it "returns on a capture with correct amount" do
         subject.auth(@transaction_id)
-        expect(subject.capture(@transaction_id, 100)).to equal(true)
+        expect { subject.capture(@transaction_id, 100) }.to_not raise_exception
       end
 
     end

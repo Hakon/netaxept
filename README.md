@@ -17,7 +17,7 @@ To interact with Nets you need to create an instance of `Netaxept::Service` with
 
 ### General
 
-Every operation except register returns true on success.
+Every operation except register returns on success.
 The `register` operation returns an object containing `transaction_id` and a `terminal_url`.
 In case of errors the operations will raise exceptions with the error message.
 The exceptions are explained in the [nets documentation](http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/API/Exceptions/).
@@ -50,7 +50,7 @@ After the user has authorized the payment on the Nets site he is redirected to t
 
     service.sale <transaction id>, <amount in cents>
 
-The response is `true` if it was successful and an Exception (mentioned under _General_) if unsuccessful.
+The method returns if it was successful and raises an Exception (mentioned under _General_) if unsuccessful.
 
 Congratulations, you have processed a payment.
 

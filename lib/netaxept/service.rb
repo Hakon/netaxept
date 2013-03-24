@@ -78,8 +78,7 @@ module Netaxept
         raise EXCEPTIONS[exception.xpath("@xsi:type").to_s], exception.xpath("Message").text
       end
 
-      true
-
+      nil
     end
 
     attr_reader :environment, :base_url, :credentials
