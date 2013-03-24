@@ -1,6 +1,6 @@
 require 'uri'
 
-RSpec::Matchers.define :valid_uri do
+RSpec::Matchers.define :be_a_valid_uri do
 
   match do |string|
     string =~ URI::regexp

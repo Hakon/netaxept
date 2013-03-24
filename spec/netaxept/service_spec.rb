@@ -54,7 +54,7 @@ module Netaxept
             currencyCode: "NOK",
             redirectUrl: "http://localhost:3000/"
           })
-        expect(response.terminal_url).to match(URI::regexp)
+        expect(response.terminal_url).to be_a_valid_uri
       end
 
     end
