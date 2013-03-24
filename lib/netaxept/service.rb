@@ -60,8 +60,9 @@ module Netaxept
       process(transactionId: transaction_id, amount: amount, operation: "SALE")
     end
 
-    def auth(transaction_id, amount)
-      process(transactionId: transaction_id, amount: amount, operation: "AUTH")
+    def auth(transaction_id)
+      process(transactionId: transaction_id, operation: "AUTH")
+    end
     end
 
     private

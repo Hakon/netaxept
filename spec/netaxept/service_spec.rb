@@ -67,7 +67,6 @@ module Netaxept
             amount: 100,
             orderNumber: "100",
             currencyCode: "NOK",
-            redirectUrl: "http://localhost:3000",
 
             serviceType: "C", # We're going to register the card at once
             pan: "4925000000000087",
@@ -82,7 +81,7 @@ module Netaxept
       end
 
       it "raises an exception on an auth with the correct amount" do
-        expect { subject.auth(@transaction_id, 100) }.to raise_exception(BBSException)
+        expect { subject.auth(@transaction_id) }.to raise_exception(BBSException)
       end
 
     end
@@ -113,7 +112,7 @@ module Netaxept
       end
 
       it "returns true on a successful auth" do
-        expect(subject.auth(@transaction_id, 100)).to equal(true)
+        expect(subject.auth(@transaction_id)).to equal(true)
       end
     end
 
