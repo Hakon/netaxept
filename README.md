@@ -11,20 +11,16 @@ or include in your _Gemfile_:
 Usage
 -----
 
-First step is to tell Netaxept your credentials and the desired mode:
+To interact with Netaxept you need to create an instance of `Netaxept::Service` with your credentials:
 
-    Netaxept::Service.authenticate <merchant id>, <token>
-    Netaxept::Service.environment =  :test|:production
-
-To interact with Netaxept you need to create an instance of `Netaxept::Service`:
-
-    service = Netaxept::Service.new
+    service = Netaxept::Service.new(<merchant id>, <token>, :test|:production)
 
 ### General
 
-Every request returns a `Netaxept::Response` object, which has a `success?` method.
-In case of an error you can call `errors`, which gives you a list of `Netaxept::ErrorMessage`s
-(each with a `message`, `code`, `source` and `text`).
+Every operation except register returns true on success.
+The `register` operation returns an object containing `transaction_id` and a `terminal_url`.
+In case of errors the operations will raise exceptions with the error message.
+The exceptions are explained in the [nets documentation](http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/API/Exceptions/).
 
 ### Off-site payment workflow
 
@@ -35,12 +31,16 @@ for details).
 
 #### Registering a payment
 
-    service.register <amount in cents>, <order number>, <options>
+    service.register({
+      amount: <amount in cents>,
+      orderNumber: <order number>,
+      currencyCode: <3 letter ISO code>,
+      redirectUrl: <url the terminal should return the user to on completion>
+    })
 
-Required options are `CurrencyCode` (3 letter ISO code) and `redirectUrl`.
+These are the required options.
 
-On success the response object gives you a `transaction_id`.
-You pass that to `Netaxept::Service.terminal_url(<transaction id>)` to get the URL for redirecting the user.
+On success the response object gives you a `transaction_id` and a `terminal_url`.
 
 For details on the options see http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/API/Register/
 
@@ -50,7 +50,7 @@ After the user has authorized the payment on the Netaxept site he is redirected 
 
     service.sale <transaction id>, <amount in cents>
 
-The response is a `Responses::SaleResponse` which only has the `success?` and `errors` methods mentioned under _General_.
+The response is `true` if it was successful and an Exception (mentioned under _General_) if unsuccessful.
 
 Congratulations, you have processed a payment.
 
@@ -60,4 +60,4 @@ Testing
 To run the tests:
 
     $ bundle
-    $ rake MERCHANT_ID=<your merchant id> NETAXEPT_TOKEN=<your token>
+    $ MERCHANT_ID=<your merchant id> NETAXEPT_TOKEN=<your token> rake
