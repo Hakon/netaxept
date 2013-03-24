@@ -114,6 +114,33 @@ module Netaxept
       it "returns true on a successful auth" do
         expect(subject.auth(@transaction_id)).to equal(true)
       end
+
+      it "returns true on a capture with correct amount" do
+        subject.auth(@transaction_id)
+        expect(subject.capture(@transaction_id, 100)).to equal(true)
+      end
+
+    end
+
+    context "with a card with authorized amount but fails on capture" do
+      before do
+        response = subject.register({
+            amount: 100,
+            orderNumber: "100",
+            currencyCode: "NOK",
+
+            serviceType: "C", # We're going to register the card at once
+            pan: "4925000000000079",
+            expiryDate: Time.now.strftime("%m%y"),
+            securityCode: "111"
+          })
+        @transaction_id = response.transaction_id
+        subject.auth(@transaction_id)
+      end
+
+      it "raises a BBSException" do
+        expect { subject.capture(@transaction_id, 100) }.to raise_exception(BBSException)
+      end
     end
 
   end

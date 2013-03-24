@@ -63,6 +63,9 @@ module Netaxept
     def auth(transaction_id)
       process(transactionId: transaction_id, operation: "AUTH")
     end
+
+    def capture(transaction_id, amount)
+      process(transactionId: transaction_id, amount: amount, operation: "CAPTURE")
     end
 
     private
