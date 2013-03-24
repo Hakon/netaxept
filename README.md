@@ -11,7 +11,7 @@ or include in your _Gemfile_:
 Usage
 -----
 
-To interact with Netaxept you need to create an instance of `Netaxept::Service` with your credentials:
+To interact with Nets you need to create an instance of `Netaxept::Service` with your credentials:
 
     service = Netaxept::Service.new(<merchant id>, <token>, :test|:production)
 
@@ -25,8 +25,8 @@ The exceptions are explained in the [nets documentation](http://www.betalingster
 ### Off-site payment workflow
 
 The following applies for the _Nets hosted_ service type where the user is redirect to the
-Netaxept site to enter her payment details (see the
-[Netaxept docs](http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/Overview/)
+Nets site to enter her payment details (see the
+[Nets docs](http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/Overview/)
 for details).
 
 #### Registering a payment
@@ -46,7 +46,7 @@ For details on the options see http://www.betalingsterminal.no/Netthandel-forsid
 
 #### Completing a payment
 
-After the user has authorized the payment on the Netaxept site he is redirected to the `redirectUrl` you provided. Netaxept adds a `resonseCode` and `transactionId` parameter to the URL. To finalize the payment you call `sale` on the service.
+After the user has authorized the payment on the Nets site he is redirected to the `redirectUrl` you provided. Nets adds a `resonseCode` and `transactionId` parameter to the URL. To finalize the payment you call `sale` on the service.
 
     service.sale <transaction id>, <amount in cents>
 
