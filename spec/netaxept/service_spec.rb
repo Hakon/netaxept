@@ -138,7 +138,7 @@ module Netaxept
         subject.auth(@transaction_id)
       end
 
-      it "raises a BBSException" do
+      it "raises a BBSException when trying to capture the correct amount" do
         expect { subject.capture(@transaction_id, 100) }.to raise_exception(BBSException)
       end
     end
