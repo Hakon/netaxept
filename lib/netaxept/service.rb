@@ -2,16 +2,17 @@ require "rest_client"
 require "nokogiri"
 
 module Netaxept
-  UnknownEnvironmentError = Class.new(StandardError)
-  ValidationException = Class.new(StandardError)
-  AuthenticationException = Class.new(StandardError)
-  BBSException = Class.new(StandardError)
-  MerchantTranslationException = Class.new(StandardError)
-  UniqueTransactionIdException = Class.new(StandardError)
-  SecurityException = Class.new(StandardError)
-  QueryException = Class.new(StandardError)
-  GenericError = Class.new(StandardError)
-  NotSupportedException = Class.new(StandardError)
+  Error = Class.new(StandardError)
+  UnknownEnvironmentError = Class.new(Error)
+  ValidationException = Class.new(Error)
+  AuthenticationException = Class.new(Error)
+  BBSException = Class.new(Error)
+  MerchantTranslationException = Class.new(Error)
+  UniqueTransactionIdException = Class.new(Error)
+  SecurityException = Class.new(Error)
+  QueryException = Class.new(Error)
+  GenericError = Class.new(Error)
+  NotSupportedException = Class.new(Error)
 
   RegisterResponse = Struct.new(:transaction_id, :terminal_url)
 
