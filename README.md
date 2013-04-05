@@ -21,6 +21,7 @@ Every operation except register returns on success.
 The `register` operation returns an object containing `transaction_id` and a `terminal_url`.
 In case of errors the operations will raise exceptions with the error message.
 The exceptions are explained in the [nets documentation](http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/API/Exceptions/).
+All exceptions are subclasses of Netaxept::Error, if you need to catch all errors in one.
 
 ### Off-site payment workflow
 
