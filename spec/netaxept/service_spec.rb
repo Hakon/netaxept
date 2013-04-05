@@ -1,5 +1,6 @@
 require "spec_helper"
 require "netaxept/service"
+require 'open-uri'
 
 require 'uri'
 
@@ -54,7 +55,9 @@ module Netaxept
             currencyCode: "NOK",
             redirectUrl: "http://localhost:3000/"
           })
+        puts response.terminal_url
         expect(response.terminal_url).to be_a_valid_uri
+        expect(open(response.terminal_url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)).to_not include("Internal error")
       end
 
     end

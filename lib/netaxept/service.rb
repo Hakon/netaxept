@@ -52,7 +52,7 @@ module Netaxept
       end
 
       transaction_id = xml_response.xpath("/RegisterResponse/TransactionId").text
-      RegisterResponse.new(transaction_id, base_url + "/Terminal/default.aspx?merchant_id=#{credentials[:merchantId]}&transactionId=#{transaction_id}")
+      RegisterResponse.new(transaction_id, base_url + "/Terminal/default.aspx?merchantId=#{credentials[:merchantId]}&transactionId=#{transaction_id}")
 
     end
 
