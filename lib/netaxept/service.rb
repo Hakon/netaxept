@@ -69,6 +69,10 @@ module Netaxept
       process(transactionId: transaction_id, amount: amount, operation: "CAPTURE")
     end
 
+    def credit(transaction_id, amount)
+      process(transactionId: transaction_id, amount: amount, operation: "CREDIT")
+    end
+
     private
 
     def process(params)
