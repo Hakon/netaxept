@@ -58,7 +58,7 @@ module Netaxept
     end
 
     def sale(transaction_id, amount)
-      process(transactionId: transaction_id, amount: amount, operation: "SALE")
+      process(transactionId: transaction_id, operation: "SALE", amount: amount)
     end
 
     def auth(transaction_id)
@@ -66,7 +66,11 @@ module Netaxept
     end
 
     def capture(transaction_id, amount)
-      process(transactionId: transaction_id, amount: amount, operation: "CAPTURE")
+      process(transactionId: transaction_id, operation: "CAPTURE", amount: amount)
+    end
+
+    def credit(transaction_id, amount)
+      process(transactionId: transaction_id, operation: "CREDIT", amount: amount)
     end
 
     private
