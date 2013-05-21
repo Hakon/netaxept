@@ -54,7 +54,6 @@ module Netaxept
 
       transaction_id = xml_response.xpath("/RegisterResponse/TransactionId").text
       RegisterResponse.new(transaction_id, base_url + "/Terminal/default.aspx?merchantId=#{credentials[:merchantId]}&transactionId=#{transaction_id}")
-
     end
 
     def sale(transaction_id, amount)

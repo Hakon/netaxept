@@ -7,13 +7,37 @@ require 'uri'
 module Netaxept
 
   describe Service do
-
     context "with incorrect credentials" do
+      let(:service) { Service.new("", "", :test) }
 
-      subject { Service.new("", "", :test) }
+      describe '#register' do
+        it "raises an auth error" do
+          expect { service.register({}) }.to raise_exception(AuthenticationException)
+        end
+      end
 
-      it "fails at registering" do
-        expect { subject.register({}) }.to raise_exception(AuthenticationException)
+      describe '#sale' do
+        it "raises an auth error" do
+          expect { service.sale('txn-1', 10) }.to raise_exception(AuthenticationException)
+        end
+      end
+
+      describe '#auth' do
+        it "raises an auth error" do
+          expect { service.auth('txn-2') }.to raise_exception(AuthenticationException)
+        end
+      end
+
+      describe '#capture' do
+        it "raises an auth error" do
+          expect { service.capture('txn-3', 10) }.to raise_exception(AuthenticationException)
+        end
+      end
+
+      describe '#credit' do
+        it "raises an auth error" do
+          expect { service.credit('txn-4', 10) }.to raise_exception(AuthenticationException)
+        end
       end
     end
 
@@ -32,7 +56,7 @@ module Netaxept
     end
 
     describe "registering a new transaction" do
-      
+
       it "raises a validation error when Nets encouters a validation error" do
         expect { subject.register({}) }.to raise_exception(ValidationException)
       end
@@ -55,7 +79,7 @@ module Netaxept
             currencyCode: "NOK",
             redirectUrl: "http://localhost:3000/"
           })
-        
+
         expect(response.terminal_url).to be_a_valid_uri
         expect(open(response.terminal_url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)).to_not include("Internal error")
       end
