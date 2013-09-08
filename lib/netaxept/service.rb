@@ -72,6 +72,10 @@ module Netaxept
       process(transactionId: transaction_id, operation: "CREDIT", transactionAmount: amount)
     end
 
+    def annul(transaction_id)
+      process(transactionId: transaction_id, operation: "ANNUL")
+    end
+
     private
 
     def process(params)
