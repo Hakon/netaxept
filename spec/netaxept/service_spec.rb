@@ -97,6 +97,12 @@ module Netaxept
           expect { service.credit('txn-4', 10) }.to raise_exception(AuthenticationException)
         end
       end
+
+      describe '#annul' do
+        it "raises an auth error" do
+          expect { service.credit('txn-5', 10) }.to raise_exception(AuthenticationException)
+        end
+      end
     end
 
     describe '.new' do
@@ -226,6 +232,34 @@ module Netaxept
 
       it "returns with no error" do
         expect { subject }.to_not raise_exception
+      end
+    end
+
+    describe '#annul' do
+      subject { service.annul(transaction_id) }
+
+      context "when authorized" do
+        include_context 'register with a good card'
+
+        before do
+          service.auth(transaction_id)
+        end
+
+        it "returns with no error" do
+          expect { subject }.to_not raise_exception
+        end
+      end
+
+      context "when captured" do
+        include_context 'register with a good card'
+
+        before do
+          service.sale(transaction_id, amount)
+        end
+
+        it "raises a GenericError exception" do
+          expect { subject }.to raise_exception(GenericError)
+        end
       end
     end
   end
